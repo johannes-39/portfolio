@@ -5,6 +5,42 @@
 <script src="assets/e31955d3-a99f-486e-bb19-20aad3c0c35d.js"></script>
 </head>
 <body>
+  <script>
+(function(){
+  var KEY='portfolio_auth';
+  if(sessionStorage.getItem(KEY)==='1') return;
+  var overlay=document.createElement('div');
+  overlay.id='auth-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a0d11;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace';
+  overlay.innerHTML='<div style="width:340px;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px 36px;text-align:center">'
+    +'<div style="font-size:13px;color:oklch(0.84 0.12 190);letter-spacing:0.04em;margin-bottom:20px">// privat</div>'
+    +'<h2 style="font-size:22px;font-weight:600;color:#e6edf3;letter-spacing:-0.02em;margin-bottom:8px">Portfolio</h2>'
+    +'<p style="font-size:13px;color:#8b98a5;margin-bottom:28px">Passwort erforderlich</p>'
+    +'<input id="auth-pw" type="password" placeholder="Passwort" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:12px 14px;font-family:inherit;font-size:14px;color:#e6edf3;outline:none;box-sizing:border-box;margin-bottom:10px">'
+    +'<div id="auth-err" style="font-size:12px;color:#f07;margin-bottom:10px;min-height:16px"></div>'
+    +'<button id="auth-btn" style="width:100%;background:oklch(0.80 0.12 190);border:none;border-radius:8px;padding:13px;font-family:inherit;font-size:14px;font-weight:500;color:#fff;cursor:pointer">Einloggen</button>'
+    +'</div>';
+  document.documentElement.appendChild(overlay);
+  document.addEventListener('DOMContentLoaded',function(){
+    var pw=document.getElementById('auth-pw');
+    var btn=document.getElementById('auth-btn');
+    var err=document.getElementById('auth-err');
+    function attempt(){
+      if(pw.value==='admin'){
+        sessionStorage.setItem(KEY,'1');
+        overlay.remove();
+      } else {
+        err.textContent='Falsches Passwort';
+        pw.value='';
+        pw.focus();
+      }
+    }
+    btn.addEventListener('click',attempt);
+    pw.addEventListener('keydown',function(e){ if(e.key==='Enter') attempt(); });
+    pw.focus();
+  });
+})();
+</script>
 <x-dc>
 
 <helmet>
