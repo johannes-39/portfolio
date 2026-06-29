@@ -528,6 +528,7 @@
             <a href="mailto:{{ email }}" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:#fff;background:var(--accent-dim);text-decoration:none;padding:14px 24px;border-radius:9px" style-hover="filter:brightness(1.08)">{{ email }}</a>
             <a href="{{ githubUrl }}" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--text);background:var(--soft);border:1px solid var(--border-strong);text-decoration:none;padding:14px 24px;border-radius:9px" style-hover="background:var(--hover)">GitHub</a>
             <a href="{{ linkedinUrl }}" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--text);background:var(--soft);border:1px solid var(--border-strong);text-decoration:none;padding:14px 24px;border-radius:9px" style-hover="background:var(--hover)">LinkedIn</a>
+            <button onclick="document.getElementById('cal-modal').style.display='flex'" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--accent);background:var(--soft);border:1px solid var(--accent-dim);border-radius:9px;padding:14px 24px;cursor:pointer;display:inline-flex;align-items:center;gap:8px" style-hover="background:var(--hover)">📅 {{ t.cal_btn }}</button>
           </div>
         </div>
       </div>
@@ -586,7 +587,18 @@ class Component extends DCLogic {
       lbl_contact:'// kontakt',
       contact_h:'Lass uns dein naechstes Projekt bauen.',
       contact_p:'Offen fuer Anfragen rund um Entwicklung, Architektur und Beratung. Schreib mir gerne.',
-      footer:'gebaut mit Code & Kaffee'
+      footer:'gebaut mit Code & Kaffee',
+      cal_btn:'Termin buchen',
+      cal_title:'Termin vereinbaren',
+      cal_label_title:'Titel',
+      cal_label_date:'Datum',
+      cal_label_time:'Uhrzeit',
+      cal_label_dur:'Dauer',
+      cal_dur_30:'30 Min',
+      cal_dur_60:'60 Min',
+      cal_dur_90:'90 Min',
+      cal_cancel:'Abbrechen',
+      cal_download:'In Kalender laden'
     },
     en: {
       nav_about:'about', nav_skills:'skills', nav_projects:'projects', nav_services:'services', nav_contact:'contact',
@@ -626,7 +638,18 @@ class Component extends DCLogic {
       lbl_contact:'// contact',
       contact_h:'Let\u2019s build your next project.',
       contact_p:'Open for inquiries around development, architecture and consulting. Feel free to reach out.',
-      footer:'built with code & coffee'
+      footer:'built with code & coffee',
+      cal_btn:'Book appointment',
+      cal_title:'Schedule a meeting',
+      cal_label_title:'Title',
+      cal_label_date:'Date',
+      cal_label_time:'Time',
+      cal_label_dur:'Duration',
+      cal_dur_30:'30 min',
+      cal_dur_60:'60 min',
+      cal_dur_90:'90 min',
+      cal_cancel:'Cancel',
+      cal_download:'Add to calendar'
     }
   };
 
@@ -667,4 +690,132 @@ class Component extends DCLogic {
 </script>
 
 
+
+<!-- Calendar booking modal -->
+<div id="cal-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(10,13,17,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace">
+  <div style="width:min(420px,92vw);background:#111418;border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:36px 32px;position:relative">
+    <div style="font-size:12px;color:oklch(0.84 0.12 190);letter-spacing:0.04em;margin-bottom:10px">// termin</div>
+    <h2 style="font-size:20px;font-weight:600;color:#e6edf3;letter-spacing:-0.02em;margin-bottom:26px" id="cal-heading">Termin vereinbaren</h2>
+
+    <label style="display:block;font-size:12px;color:#8b98a5;margin-bottom:6px" id="cal-lbl-title">Titel</label>
+    <input id="cal-f-title" type="text" value="Meeting mit Johannes"
+      style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#e6edf3;outline:none;box-sizing:border-box;margin-bottom:16px">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div>
+        <label style="display:block;font-size:12px;color:#8b98a5;margin-bottom:6px" id="cal-lbl-date">Datum</label>
+        <input id="cal-f-date" type="date"
+          style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#e6edf3;outline:none;box-sizing:border-box;color-scheme:dark">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:#8b98a5;margin-bottom:6px" id="cal-lbl-time">Uhrzeit</label>
+        <input id="cal-f-time" type="time" value="10:00"
+          style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#e6edf3;outline:none;box-sizing:border-box;color-scheme:dark">
+      </div>
+    </div>
+
+    <label style="display:block;font-size:12px;color:#8b98a5;margin-bottom:6px" id="cal-lbl-dur">Dauer</label>
+    <div style="display:flex;gap:10px;margin-bottom:28px">
+      <button class="cal-dur-btn" data-min="30" onclick="calSelectDur(this)"
+        style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:9px 0;border-radius:8px;cursor:pointer;border:1px solid oklch(0.84 0.12 190);background:oklch(0.84 0.12 190 / 0.15);color:oklch(0.84 0.12 190)" id="cal-dur-30">30 Min</button>
+      <button class="cal-dur-btn" data-min="60" onclick="calSelectDur(this)"
+        style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:9px 0;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#8b98a5" id="cal-dur-60">60 Min</button>
+      <button class="cal-dur-btn" data-min="90" onclick="calSelectDur(this)"
+        style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:9px 0;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#8b98a5" id="cal-dur-90">90 Min</button>
+    </div>
+
+    <div id="cal-err" style="font-size:12px;color:#ff4466;min-height:16px;margin-bottom:10px"></div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('cal-modal').style.display='none'"
+        style="flex:1;font-family:'JetBrains Mono',monospace;font-size:13px;color:#8b98a5;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:9px;padding:13px;cursor:pointer" id="cal-btn-cancel">Abbrechen</button>
+      <button onclick="calDownload()"
+        style="flex:2;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:#fff;background:oklch(0.80 0.12 190);border:none;border-radius:9px;padding:13px;cursor:pointer" id="cal-btn-dl">In Kalender laden</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Set today as default date
+  var today = new Date();
+  var yyyy = today.getFullYear();
+  var mm = String(today.getMonth()+1).padStart(2,'0');
+  var dd = String(today.getDate()+1).padStart(2,'0'); // tomorrow
+  document.getElementById('cal-f-date').value = yyyy+'-'+mm+'-'+dd;
+
+  // Close on backdrop click
+  document.getElementById('cal-modal').addEventListener('click', function(e){
+    if(e.target === this) this.style.display='none';
+  });
+})();
+
+var calSelectedMin = 30;
+
+function calSelectDur(btn){
+  calSelectedMin = parseInt(btn.dataset.min);
+  document.querySelectorAll('.cal-dur-btn').forEach(function(b){
+    b.style.border = '1px solid rgba(255,255,255,0.12)';
+    b.style.background = 'rgba(255,255,255,0.04)';
+    b.style.color = '#8b98a5';
+  });
+  btn.style.border = '1px solid oklch(0.84 0.12 190)';
+  btn.style.background = 'oklch(0.84 0.12 190 / 0.15)';
+  btn.style.color = 'oklch(0.84 0.12 190)';
+}
+
+function calDownload(){
+  var title = document.getElementById('cal-f-title').value.trim();
+  var date  = document.getElementById('cal-f-date').value;
+  var time  = document.getElementById('cal-f-time').value;
+  var err   = document.getElementById('cal-err');
+  err.textContent = '';
+  if(!title){ err.textContent='Bitte einen Titel eingeben.'; return; }
+  if(!date){  err.textContent='Bitte ein Datum wählen.'; return; }
+  if(!time){  err.textContent='Bitte eine Uhrzeit wählen.'; return; }
+
+  // Build ICS timestamps (local, no timezone offset)
+  var parts = date.split('-');
+  var tparts = time.split(':');
+  var start = new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]),parseInt(tparts[0]),parseInt(tparts[1]));
+  var end   = new Date(start.getTime() + calSelectedMin*60000);
+
+  function fmt(d){
+    return d.getFullYear()
+      + String(d.getMonth()+1).padStart(2,'0')
+      + String(d.getDate()).padStart(2,'0')
+      + 'T'
+      + String(d.getHours()).padStart(2,'0')
+      + String(d.getMinutes()).padStart(2,'0')
+      + '00';
+  }
+
+  var uid = Date.now() + '@portfolio';
+  var ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Portfolio//Termin//DE',
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + fmt(new Date()),
+    'DTSTART:' + fmt(start),
+    'DTEND:' + fmt(end),
+    'SUMMARY:' + title,
+    'DESCRIPTION:Termin erstellt über das Portfolio.',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = title.replace(/\s+/g,'-') + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  document.getElementById('cal-modal').style.display='none';
+}
+</script>
 </body></html>
